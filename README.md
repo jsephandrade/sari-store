@@ -18,7 +18,20 @@ cd backend
 pip install -r requirements.txt
 ```
 
-Configure your MySQL connection in `sari_store/settings.py` and run migrations:
+The backend reads its MySQL credentials from environment variables so it can
+connect to a live database or fall back to SQLite for tests. Set the following
+variables before running migrations:
+
+```
+export DB_ENGINE=django.db.backends.mysql
+export DB_NAME=sari_store_db
+export DB_USER=sari_admin
+export DB_PASSWORD=hotmariaclara24
+export DB_HOST=localhost
+export DB_PORT=3306
+```
+
+Run migrations to create the schema:
 
 ```bash
 python manage.py migrate

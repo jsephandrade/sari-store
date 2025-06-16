@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -57,14 +58,22 @@ REST_FRAMEWORK = {
     ),
 }
 
+DB_ENGINE = os.getenv("DB_ENGINE", "django.db.backends.mysql")
+DB_NAME = os.getenv(
+    "DB_NAME",
+    str(BASE_DIR / "db.sqlite3") if DB_ENGINE == "django.db.backends.sqlite3" else "sari_store_db",
+)
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "sari_store_db",
-        "USER": "sari_admin",
-        "PASSWORD": "hotmariaclara24",
-        "HOST": "localhost",
-        "PORT": "3306",
+        "ENGINE": DB_ENGINE,
+        "NAME": DB_NAME,
+        "USER": os.getenv("DB_USER", "sari_admin"),
+        "PASSWORD": os.getenv("DB_PASSWORD", "hotmariaclara24"),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "3306"),
+        "CONN_MAX_AGE": int(os.getenv("DB_CONN_MAX_AGE", "60")),
+        "CONN_HEALTH_CHECKS": True,
     }
 }
 
@@ -78,3 +87,19 @@ USE_I18N = True
 USE_TZ = True
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        }
+    },
+    "loggers": {
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "ERROR",
+        }
+    },
+}
