@@ -1,61 +1,46 @@
 # Sari-Sari Store Sample
 
-This repository contains a sample implementation of a Sari-Sari store web application with an **utang** (credit) management system. The backend is built with **Django** and **Django REST Framework** while the frontend uses **Vite**, **React** and **Tailwind CSS**.
+This repository contains a minimal Sari-Sari store application with a Django REST
+backend and a Vite + React frontend. It is intended as a starting point for
+experiments and tutorials.
+
+## Environment Variables
+
+Copy the provided examples and adjust values for your environment:
+
+```bash
+cp .env.example .env
+cp frontend/.env.example frontend/.env
+```
+
+Key variables:
+
+- `FRONTEND_API_URL` – URL where the React app will reach the backend.
+- `BACKEND_API_URL` – URL where the Django API will be served.
+- `DB_*` – MySQL connection details used by Django.
+- `VITE_API_URL` – same as `BACKEND_API_URL` but consumed by Vite during the
+  frontend build.
 
 ## Backend
 
-The Django project lives in the `backend/` directory. Main features:
-
-- Models for `Product`, `Category`, `Customer`, `UtangEntry`, `Payment` and `Sale`.
-- JWT authentication using `djangorestframework-simplejwt`.
-- CRUD API endpoints for products, categories, customers and sales.
-- Endpoints to manage utang entries, record payments and track price adjustments.
-
-Create a virtual environment and install dependencies:
+The Django project lives in `backend/`.
 
 ```bash
 cd backend
 pip install -r requirements.txt
-```
-
-The backend reads its MySQL credentials from environment variables so it can
-connect to a live database or fall back to SQLite for tests. Create a `.env`
-file using the provided example and adjust the credentials before running
-migrations:
-
-```bash
-cp .env.example .env
-```
-
-Then edit `.env` with your MySQL settings. Example contents:
-
-```
-export DB_ENGINE=django.db.backends.mysql
-export DB_NAME=sari_store_db
-export DB_USER=sari_admin
-export DB_PASSWORD=hotmariaclara24
-export DB_HOST=localhost
-export DB_PORT=3306
-```
-
-Run migrations to create the schema:
-
-```bash
 python manage.py migrate
-python manage.py createsuperuser
+python manage.py runserver
 ```
 
-Run the development server:
+Running the tests requires the same dependencies and database access:
 
 ```bash
-python manage.py runserver
+pytest -q
 ```
 
 ## Frontend
 
-The `frontend/` directory contains a Vite React project configured with Tailwind CSS. It demonstrates the basic components and routing for the store dashboard, products, customers and utang ledger. The dashboard aggregates sales and balances with quick links into each module, and a simple POS screen updates inventory and utang in real time.
-
-Install dependencies and start the dev server:
+The React frontend is in `frontend/`.
 
 ```bash
 cd frontend
@@ -63,13 +48,23 @@ npm install
 npm run dev
 ```
 
-When serving the production build outside of the Vite development server,
-set the `VITE_API_URL` environment variable so the frontend knows where your
-Django backend lives:
+To build a production bundle:
 
 ```bash
-export VITE_API_URL=http://localhost:8000
-npm run build
+VITE_API_URL=$BACKEND_API_URL npm run build
 ```
 
-This is a minimal example intended for educational purposes. Use it as a starting point for a more complete application.
+## Docker Compose
+
+A simple `docker-compose.yml` is included to run MySQL, the Django API and the
+built frontend together:
+
+```bash
+docker-compose up --build
+```
+
+## OpenAPI Documentation
+
+A basic OpenAPI specification describing the available `/api` endpoints can be
+found in `openapi.yaml`.
+
