@@ -25,14 +25,16 @@ class CustomerViewSet(viewsets.ModelViewSet):
 
 
 class UtangEntryViewSet(viewsets.ModelViewSet):
-    queryset = UtangEntry.objects.select_related('customer', 'product').prefetch_related('payments')
+    queryset = UtangEntry.objects.select_related(
+        "customer", "product"
+    ).prefetch_related("payments")
     serializer_class = UtangEntrySerializer
-    http_method_names = ['get', 'post', 'put', 'patch', 'delete']
+    http_method_names = ["get", "post", "put", "patch", "delete"]
 
     def get_queryset(self):
         qs = self.queryset
-        customer_id = self.request.query_params.get('customer')
-        status = self.request.query_params.get('status')
+        customer_id = self.request.query_params.get("customer")
+        status = self.request.query_params.get("status")
         if customer_id:
             qs = qs.filter(customer_id=customer_id)
         if status:
@@ -41,7 +43,7 @@ class UtangEntryViewSet(viewsets.ModelViewSet):
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
-    queryset = Payment.objects.select_related('utang_entry')
+    queryset = Payment.objects.select_related("utang_entry")
     serializer_class = PaymentSerializer
 
     def create(self, request, *args, **kwargs):
@@ -50,26 +52,35 @@ class PaymentViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         payment = serializer.instance
         utang = payment.utang_entry
-        total_paid = utang.payments.aggregate(total=Sum('amount_paid'))['total'] or 0
+        total_paid = utang.payments.aggregate(total=Sum("amount_paid"))["total"] or 0
         if total_paid >= utang.total_amount:
-            utang.status = 'paid'
+            utang.status = "paid"
             utang.save()
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
 
 class SummaryViewSet(viewsets.ViewSet):
     def list(self, request):
         total_products = Product.objects.count()
-        total_utang = UtangEntry.objects.filter(status='pending').aggregate(total=Sum('total_amount'))['total'] or 0
-        recent_payments = Payment.objects.order_by('-date_paid')[:5].values(
-            'utang_entry__customer__name', 'amount_paid', 'date_paid'
+        total_utang = (
+            UtangEntry.objects.filter(status="pending").aggregate(
+                total=Sum("total_amount")
+            )["total"]
+            or 0
         )
-        return Response({
-            'total_products': total_products,
-            'total_utang': total_utang,
-            'recent_payments': list(recent_payments),
-        })
+        recent_payments = Payment.objects.order_by("-date_paid")[:5].values(
+            "utang_entry__customer__name", "amount_paid", "date_paid"
+        )
+        return Response(
+            {
+                "total_products": total_products,
+                "total_utang": total_utang,
+                "recent_payments": list(recent_payments),
+            }
+        )
 
 
 class RegisterView(generics.CreateAPIView):
