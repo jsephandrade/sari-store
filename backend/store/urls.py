@@ -2,14 +2,9 @@ from rest_framework import routers
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .views import (
-    ProductViewSet,
-    CustomerViewSet,
-    UtangEntryViewSet,
-    PaymentViewSet,
-    SummaryViewSet,
-    RegisterView
-)
+from .views import RegisterView
+
+from .views import ProductViewSet, CustomerViewSet, UtangEntryViewSet, PaymentViewSet, SummaryViewSet
 
 router = routers.DefaultRouter()
 router.register(r'products', ProductViewSet)

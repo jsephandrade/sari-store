@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Product, Customer, UtangEntry, Payment
-from django.contrib.auth.models import User
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -34,13 +33,3 @@ class UtangEntrySerializer(serializers.ModelSerializer):
         utang.total_amount = utang.product.price * utang.quantity
         utang.save()
         return utang
-
-class RegisterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['username', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
-
-    def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        return user
