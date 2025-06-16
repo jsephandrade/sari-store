@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Product, Customer, UtangEntry, Payment
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -42,5 +43,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
+        try:
+            user = User.objects.create_user(**validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError({
+                'username': 'A user with that username already exists.'
+            })
         return user
