@@ -4,13 +4,25 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views import RegisterView
 
-from .views import ProductViewSet, CustomerViewSet, UtangEntryViewSet, PaymentViewSet, SummaryViewSet
+from .views import (
+    ProductViewSet,
+    CustomerViewSet,
+    UtangEntryViewSet,
+    PaymentViewSet,
+    SummaryViewSet,
+    CategoryViewSet,
+    PriceAdjustmentViewSet,
+    SaleViewSet,
+)
 
 router = routers.DefaultRouter()
 router.register(r'products', ProductViewSet)
+router.register(r'categories', CategoryViewSet)
 router.register(r'customers', CustomerViewSet)
 router.register(r'utang', UtangEntryViewSet)
 router.register(r'payments', PaymentViewSet)
+router.register(r'price-adjustments', PriceAdjustmentViewSet)
+router.register(r'sales', SaleViewSet)
 router.register(r'summary', SummaryViewSet, basename='summary')
 
 urlpatterns = [

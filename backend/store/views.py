@@ -2,21 +2,44 @@ from rest_framework import viewsets, status, generics, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Sum
+from django.utils import timezone
 from django.contrib.auth.models import User
 
-from .models import Product, Customer, UtangEntry, Payment
+from .models import (
+    Product,
+    Customer,
+    UtangEntry,
+    Payment,
+    Category,
+    PriceAdjustment,
+    Sale,
+    SaleItem,
+)
 from .serializers import (
     ProductSerializer,
     CustomerSerializer,
     UtangEntrySerializer,
     PaymentSerializer,
     RegisterSerializer,
+    CategorySerializer,
+    PriceAdjustmentSerializer,
+    SaleSerializer,
 )
 
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class PriceAdjustmentViewSet(viewsets.ModelViewSet):
+    queryset = PriceAdjustment.objects.select_related("product")
+    serializer_class = PriceAdjustmentSerializer
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -62,23 +85,24 @@ class PaymentViewSet(viewsets.ModelViewSet):
         )
 
 
+class SaleViewSet(viewsets.ModelViewSet):
+    queryset = Sale.objects.prefetch_related("items")
+    serializer_class = SaleSerializer
+
+
 class SummaryViewSet(viewsets.ViewSet):
     def list(self, request):
-        total_products = Product.objects.count()
-        total_utang = (
-            UtangEntry.objects.filter(status="pending").aggregate(
-                total=Sum("total_amount")
-            )["total"]
+        total_sales = Sale.objects.aggregate(total=Sum("total_amount"))["total"] or 0
+        outstanding_balances = (
+            UtangEntry.objects.filter(status="pending").aggregate(total=Sum("total_amount"))["total"]
             or 0
         )
-        recent_payments = Payment.objects.order_by("-date_paid")[:5].values(
-            "utang_entry__customer__name", "amount_paid", "date_paid"
-        )
+        new_customers = Customer.objects.filter(created_at__gte=timezone.now() - timezone.timedelta(days=30)).count()
         return Response(
             {
-                "total_products": total_products,
-                "total_utang": total_utang,
-                "recent_payments": list(recent_payments),
+                "total_sales": total_sales,
+                "outstanding_balances": outstanding_balances,
+                "new_customers": new_customers,
             }
         )
 
