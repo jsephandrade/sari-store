@@ -56,4 +56,13 @@ npm install
 npm run dev
 ```
 
+When serving the production build outside of the Vite development server,
+set the `VITE_API_URL` environment variable so the frontend knows where your
+Django backend lives:
+
+```bash
+export VITE_API_URL=http://localhost:8000
+npm run build
+```
+
 This is a minimal example intended for educational purposes. Use it as a starting point for a more complete application.
