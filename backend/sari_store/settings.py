@@ -61,7 +61,9 @@ REST_FRAMEWORK = {
     ),
 }
 
-DB_ENGINE = os.getenv("DB_ENGINE", "django.db.backends.mysql")
+# Use SQLite by default for easier local setup. A different engine can be
+# supplied via environment variables when needed.
+DB_ENGINE = os.getenv("DB_ENGINE", "django.db.backends.sqlite3")
 DB_NAME = os.getenv(
     "DB_NAME",
     str(BASE_DIR / "db.sqlite3") if DB_ENGINE == "django.db.backends.sqlite3" else "sari_store_db",
