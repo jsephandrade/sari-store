@@ -2,9 +2,7 @@ from rest_framework import viewsets, status, generics, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Sum
-from django.utils import timezone
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import make_password
 
 from .models import Product, Customer, UtangEntry, Payment
 from .serializers import (
@@ -12,6 +10,7 @@ from .serializers import (
     CustomerSerializer,
     UtangEntrySerializer,
     PaymentSerializer,
+    RegisterSerializer,
 )
 
 
@@ -75,15 +74,4 @@ class SummaryViewSet(viewsets.ViewSet):
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = serializers.ModelSerializer
-
-    class RegisterSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = User
-            fields = ('id', 'username', 'password')
-
-        def create(self, validated_data):
-            validated_data['password'] = make_password(validated_data['password'])
-            return super().create(validated_data)
-
     serializer_class = RegisterSerializer

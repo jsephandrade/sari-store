@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Product, Customer, UtangEntry, Payment
-from rest_framework import generics
 from django.contrib.auth.models import User
 
 
@@ -45,7 +44,3 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
-
-class RegisterAPIView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer

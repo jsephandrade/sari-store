@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import axios from 'axios'
+import api from '../utils/api'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -14,7 +14,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await axios.post('/api/auth/token/', form)
+      const res = await api.post('/api/auth/token/', form)
       localStorage.setItem('token', res.data.access)
       navigate('/')
     } catch (err) {

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import axios from 'axios'
+import api from '../utils/api'
 
 export default function Signup() {
   const navigate = useNavigate()
@@ -14,7 +14,7 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      await axios.post('/api/auth/register/', form)
+      await api.post('/api/auth/register/', form)
       navigate('/login')
     } catch (err) {
       setError('Unable to sign up')
