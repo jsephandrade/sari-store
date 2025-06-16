@@ -2,7 +2,10 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+# The project's .env file lives in the repository root. When running
+# `manage.py` from the `backend` folder, python-dotenv won't find it
+# automatically, so we provide the exact path.
+load_dotenv(Path(__file__).resolve().parent.parent.parent / '.env')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 

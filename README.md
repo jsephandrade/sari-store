@@ -19,9 +19,9 @@ pip install -r requirements.txt
 ```
 
 The backend reads its MySQL credentials from environment variables so it can
-connect to a live database or fall back to SQLite for tests. Create a `.env`
-file using the provided example and adjust the credentials before running
-migrations:
+connect to a live database or fall back to SQLite for tests. The `.env` file
+should live in the repository root (beside this README). Create it from the
+provided example and adjust the credentials before running migrations:
 
 ```bash
 cp .env.example .env
