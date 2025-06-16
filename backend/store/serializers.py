@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.db import models
+from django.db import models, transaction
 from .models import (
     Product,
     Customer,
@@ -52,9 +52,10 @@ class UtangEntrySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        utang = super().create(validated_data)
-        utang.total_amount = utang.product.price * utang.quantity
-        utang.save()
+        with transaction.atomic():
+            utang = super().create(validated_data)
+            utang.total_amount = utang.product.price * utang.quantity
+            utang.save()
         return utang
 
 
@@ -74,16 +75,22 @@ class SaleSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         items_data = validated_data.pop("items", [])
-        sale = Sale.objects.create(**validated_data)
-        total = 0
-        for item in items_data:
-            product = item["product"]
-            SaleItem.objects.create(sale=sale, product=product, quantity=item["quantity"], price=product.price)
-            product.stock = models.F("stock") - item["quantity"]
-            product.save(update_fields=["stock"])
-            total += product.price * item["quantity"]
-        sale.total_amount = total
-        sale.save(update_fields=["total_amount"])
+        with transaction.atomic():
+            sale = Sale.objects.create(**validated_data)
+            total = 0
+            for item in items_data:
+                product = item["product"]
+                SaleItem.objects.create(
+                    sale=sale,
+                    product=product,
+                    quantity=item["quantity"],
+                    price=product.price,
+                )
+                product.stock = models.F("stock") - item["quantity"]
+                product.save(update_fields=["stock"])
+                total += product.price * item["quantity"]
+            sale.total_amount = total
+            sale.save(update_fields=["total_amount"])
         return sale
 
 
