@@ -19,8 +19,15 @@ pip install -r requirements.txt
 ```
 
 The backend reads its MySQL credentials from environment variables so it can
-connect to a live database or fall back to SQLite for tests. Set the following
-variables before running migrations:
+connect to a live database or fall back to SQLite for tests. Create a `.env`
+file using the provided example and adjust the credentials before running
+migrations:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` with your MySQL settings. Example contents:
 
 ```
 export DB_ENGINE=django.db.backends.mysql
@@ -54,6 +61,15 @@ Install dependencies and start the dev server:
 cd frontend
 npm install
 npm run dev
+```
+
+When serving the production build outside of the Vite development server,
+set the `VITE_API_URL` environment variable so the frontend knows where your
+Django backend lives:
+
+```bash
+export VITE_API_URL=http://localhost:8000
+npm run build
 ```
 
 This is a minimal example intended for educational purposes. Use it as a starting point for a more complete application.
